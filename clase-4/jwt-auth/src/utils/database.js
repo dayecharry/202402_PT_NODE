@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const uri =
-  'mongodb+srv://dayana:STStosXtBAb06Cz5@cluster0.fci00lm.mongodb.net/upgrade?retryWrites=true&w=majority&appName=Cluster0';
+  'mongodb+srv://dayana:STStosXtBAb06Cz5@cluster0.fci00lm.mongodb.net/auth?retryWrites=true&w=majority&appName=Cluster0';
 
 const connectDB = async () => {
   try {
