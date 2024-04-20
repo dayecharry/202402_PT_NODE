@@ -1,4 +1,3 @@
-const { response } = require('express');
 const User = require('../models/user.model');
 
 const addUser = async (req, res) => {
@@ -30,7 +29,11 @@ const updateUser = async (req, res) => {
 };
 
 const selectUser = async (req, res) => {
-  const users = await User.find().populate('pet');
+  const nameUser = req.query.name;
+  //find({ name: 'alfonsina' })
+  const users = await User.find({ name: nameUser }) //findOne devuelve el primero que encuentra
+    .populate({ path: 'pet', select: 'name' })
+    .populate({ path: 'doctor', select: 'name' });
   return res.status(200).json(users);
 };
 
