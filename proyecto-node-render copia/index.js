@@ -5,8 +5,6 @@ const routerUser = require('./src/api/routes/user.routes');
 const env = require('dotenv');
 const cloudinary = require('cloudinary').v2;
 const cors = require('cors');
-const swaggerUI = require('swagger-ui-express');
-const swaggerJson = require('./swagger.json');
 
 env.config(); // para trabajar con variables de entorno
 // configuración del servidor
@@ -21,8 +19,6 @@ server.use(express.json());
 connectDB();
 server.use(cors());
 server.use('/user', routerUser);
-//ruta para ver la docuemntación en la web
-server.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerJson));
 
 //ejecucion del servidor
 const PORT = process.env.PORT;

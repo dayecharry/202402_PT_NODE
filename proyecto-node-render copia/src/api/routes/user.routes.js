@@ -16,6 +16,6 @@ router.post('/register', register);
 router.post('/login', login);
 router.put('/update', [isAuth], modifyProfile);
 router.get('/alluser', [isAuth], getUsers);
-router.get('/confirm-user/:confirmUser', confirm);
+router.get('/confirm-user/:token', confirm);
 
 module.exports = router;

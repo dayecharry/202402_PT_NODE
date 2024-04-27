@@ -2,8 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const { validateEmailDB, validatePassword } = require('../../utils/validator');
 const { generateToken } = require('../../utils/jwt');
-const generateRandomNumber = require('../../utils/gerenateRandomNumber');
-const transporter = require('../../utils/nodemailer-config');
+const { transporter } = require('../../utils/nodemailer-config');
 
 const register = async (req, res) => {
   try {
@@ -25,26 +24,30 @@ const register = async (req, res) => {
       if (valPassword) {
         //3.- Encriptar la contraseña  antes de registrarme  HASH
         userNew.password = bcrypt.hashSync(userNew.password, 10);
-        userNew.confirmUser = generateRandomNumber(); //false;
+
         const createdUser = await userNew.save();
 
+        const generateID = () => {
+          const random = Math.random().toString(32).substring(2);
+          const fecha = Date.now().toString(32);
+          return random + fecha;
+        };
+
+        userNew.tokenId = generateID();
         await transporter.sendMail(
           {
-            from: 'lucas64@ethereal.email',
-            to: req.body.email,
-            subject: 'Enviado desde nodemailer',
-            text: 'hola mundo',
-            html: `
-          <h4> Bienvenido ${req.body.name} </h4>
-          <p>Haga click en el siguiente enlace para confirmar su cuenta  <a href="http://localhost:5005/user/confirm-user/${userNew.confirmUser}"> HAGA CLICK </a> </p>
-          `,
+            from: 'dayana.romero88@gmail.com', //sender addres
+            to: 'dayana.romero88@gmail.com', //`${req.body.email}`, // list of receivers
+            subject: 'Enviado desde nodemailer ✔', // Subject line
+            text: 'Hello world?', // plain text body
+            html: `<b>Bienvenido a la aplicacion! ${req.body.name}, solo te queda un paso por realizar, pincha en el siguiente enláce para completar tu registro: <a href="http://localhost:5005/auth/confirm-user/${userNew.token}">Confirmar usuario<a> </b>`, // html body
           },
           function (error, info) {
             if (error) {
-              console.log(error);
-              res.send('error al enviar el email');
+              console.error('Error al enviar el correo:', error);
+              res.send('Error al enviar el correo');
             } else {
-              console.log('correo enviado: ' + info.response);
+              console.log('Correo enviado:', info.response);
               res.send('Correo enviado correctamente');
             }
           }
@@ -116,21 +119,23 @@ const getUsers = async (req, res) => {
   }
 };
 
-const confirm = async (req, res) => {
-  console.log('se ha confirmado el usuario');
-  // dato de confirmacion, de usuario, confirmUser es la variable definida en el router, que corresponde al string unico guardado en la BD
-  const { confirmUser } = req.params;
-  const userDB = await User.findOne({ confirmUser });
+const confirm = async (req, res, next) => {
+  const { token } = req.params;
+  console.log(token);
+  const userConfirm = await User.findOne({ token });
+  if (!userConfirm) {
+    const error = new Error('Token no valido');
+    return res.status(403).json({ msg: error.message });
+  }
+
   try {
-    if (!userDB) {
-      return res.status(403).json({ message: 'Codigo incorrecto' });
-    }
-    //cambiar el estatus del usuario para saber que está confirmado
-    userDB.confirmUser = '';
-    await userDB.save();
-    return res.status(200).json({ message: 'Usuario confirmado' });
+    userConfirm.confirmed = true;
+    userConfirm.token = '';
+    await userConfirm.save();
+    return res.status(200).json({ msg: '¡Usuario Confirmado!' });
   } catch (error) {
-    console.log(error);
+    return res.status(404).json({ msg: err.message });
   }
 };
+
 module.exports = { register, login, modifyProfile, getUsers, confirm };
