@@ -85,7 +85,9 @@ const getUsers = async (req, res) => {
   try {
     const usersDB = await User.find();
     return res.json(usersDB);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = { register, login, modifyProfile, getUsers };
