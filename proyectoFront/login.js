@@ -1,4 +1,3 @@
-const inputName = document.querySelector('.js_name');
 const inputEmail = document.querySelector('.js_email');
 const inputPassword = document.querySelector('.js_password');
 const inputBtn = document.querySelector('.js_btn');
@@ -6,11 +5,10 @@ const p = document.querySelector('.js_result');
 
 const handleClick = () => {
   const user = {
-    name: inputName.value,
     email: inputEmail.value,
     password: inputPassword.value,
   };
-  fetch('https://proyecto-node-vercel.onrender.com/user/register', {
+  fetch('https://proyecto-node-vercel.onrender.com/user/login', {
     method: 'POST',
     body: JSON.stringify(user),
     headers: {
@@ -21,10 +19,10 @@ const handleClick = () => {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      if (!data.success) {
-        p.innerHTML = data.message;
+      if (data.success) {
+        localStorage.setItem('token', data.token);
       } else {
-        p.innerHTML = ' registrado con exito';
+        p.innerHTML = data.message;
       }
     });
 };
